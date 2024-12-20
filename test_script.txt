@@ -1,0 +1,97 @@
+import os
+import time
+import random
+import shutil
+
+# Folder to simulate the attack (use a specific test folder to avoid any unintentional consequences)
+TARGET_DIRECTORY = "target_folder"
+RANSOM_NOTE = "ransom_note.txt"
+
+# Simulated file extensions that will represent encrypted files
+ENCRYPTED_EXTENSIONS = ['.enc', '.locked', '.crypt']
+
+# Ransom message
+RANSOM_MESSAGE = """
+WARNING: Your files have been encrypted by a fake ransomware.
+To recover your files, send a payment of $1000 to the following address:
+
+Bitcoin Address: 1FfWp6cJq7R8vReUuUHvGp5xWc3QKksd
+
+Do NOT try to restore the files by any other means. Contact us for further instructions.
+"""
+
+# Simulate encryption (just renames the file with a fake extension)
+def fake_encryption(file_path):
+    # Simulate encryption by renaming the file with a random extension
+    new_file_name = f"{file_path}{random.choice(ENCRYPTED_EXTENSIONS)}"
+    os.rename(file_path, new_file_name)
+    print(f"Encrypted: {file_path} -> {new_file_name}")
+    return new_file_name
+
+# Simulate ransom note
+def create_ransom_note():
+    with open(RANSOM_NOTE, "w") as ransom_file:
+        ransom_file.write(RANSOM_MESSAGE)
+    print(f"Ransom note created: {RANSOM_NOTE}")
+
+# Simulate the ransomware attack
+def simulate_ransomware_attack(target_directory):
+    # Ensure target directory exists
+    if not os.path.exists(target_directory):
+        os.makedirs(target_directory)
+        print(f"Created target folder: {target_directory}")
+    
+    # Simulate file creation in the target folder
+    print(f"Simulating file creation in {target_directory}...")
+    for i in range(5):
+        file_path = os.path.join(target_directory, f"file_{i}.txt")
+        with open(file_path, "w") as f:
+            f.write(f"Sample data for file {i}.\n")
+        print(f"Created file: {file_path}")
+
+    # Fake encryption of files in the target folder
+    print("Simulating file encryption...")
+    for file_name in os.listdir(target_directory):
+        file_path = os.path.join(target_directory, file_name)
+        if os.path.isfile(file_path):
+            fake_encryption(file_path)
+
+    # Create and display the ransom note
+    create_ransom_note()
+
+    print("\n--- Fake Ransomware Attack Complete ---")
+    print("All files in the target folder have been 'encrypted'. A ransom note has been created.")
+
+# Cleanup (delete the ransom note and any simulated files)
+def cleanup(target_directory):
+    print("\nCleaning up the fake ransomware files...")
+    # Remove ransom note
+    if os.path.exists(RANSOM_NOTE):
+        os.remove(RANSOM_NOTE)
+        print(f"Removed: {RANSOM_NOTE}")
+    
+    # Remove simulated encrypted files
+    if os.path.exists(target_directory):
+        for file_name in os.listdir(target_directory):
+            file_path = os.path.join(target_directory, file_name)
+            if os.path.isfile(file_path):
+                os.remove(file_path)
+                print(f"Removed: {file_path}")
+        
+        # Optionally, remove the target directory
+        os.rmdir(target_directory)
+        print(f"Removed target folder: {target_directory}")
+
+# Main function to run the fake ransomware simulation
+def main():
+    print("Starting Fake Ransomware Simulation...\n")
+    simulate_ransomware_attack(TARGET_DIRECTORY)
+
+    # Wait for a few seconds to let users see the simulation
+    time.sleep(5)
+
+    # Cleanup after the demonstration
+    cleanup(TARGET_DIRECTORY)
+
+if __name__ == '__main__':
+    main()
